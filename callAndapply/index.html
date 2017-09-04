@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //Function.prototype.call 和 Function.prototype.apply
+        // apply 接受两个参数，
+        // 第一个参数指定了函数体内 this 对象的指向，
+        // 第二个参数为一个带下标的集合，这个集合可以为数组，也可以为类数组， 
+        //apply 方法把这个集合中的元素作为参数传递给被调用的函数
+        var func = function (a, b, c) {
+            alert([a, b, c]); // 输出 [ 1, 2, 3 ]
+        };
+        func.apply(null, [1, 2, 3]);
+        // call 和 apply 的用途
+        //1. 改变 this 指向
+        var obj1 = {
+            name: 'sven'
+        };
+        var obj2 = {
+            name: 'anne'
+        };
+        window.name = 'window';
+        var getName = function () {
+            alert(this.name);
+        };
+        getName(); // 输出: window
+        getName.call(obj1); // 输出: sven
+        getName.call(obj2); // 输出: anne
+
+        //这时候我们用 call 来修正 func 函数内的 this ，使其依然指向 div ：
+        document.getElementById('div1').onclick = function () {
+            var func = function () {
+                alert(this.id); // 输出：div1
+            }
+            func.call(this);
+        };
+
+        document.getElementById = (function (func) {
+            return function () {
+                return func.apply(document, arguments);
+            }
+        })(document.getElementById);
+        var getId = document.getElementById;
+        var div = getId('div1');
+        alert(div.id); // 输出： div1
+
+        Function.prototype.bind = function (context) {
+            var self = this; // 保存原函数 func
+            return function () { // 返回一个新的函数
+                //func.apply(obj,第二次调用传入的参数),将执行结果返回
+                return self.apply(context, arguments); // 执行新的函数的时候，会把之前传入的 context
+                // 当作新函数体内的 this
+            }
+        };
+        var obj = {
+            name: 'sven'
+        };
+        var func = function () {
+            alert(this.name); // 输出：sven
+        }.bind(obj);
+        func();
+
+        //2.用来绑定或修正this指向
+        Function.prototype.bind = function () {
+            var self = this, // 保存原函数 func
+                context = [].shift.call(arguments), // 需要绑定的 this 上下文 obj
+                args = [].slice.call(arguments); // 剩余的参数转成数组 1,2保存起来
+            return function () { // 返回一个新的函数
+                //func.apply(obj,[].concat.call([1,2],[3,4])) 将3,4转换成真数组然后与拼接2次传入的数字组参数,返回结果
+                return self.apply(context, [].concat.call(args, [].slice.call(arguments)));
+                // 执行新的函数的时候，会把之前传入的 context 当作新函数体内的 this
+                // 并且组合两次分别传入的参数，作为新函数的参数
+            }
+        };
+        var obj = {
+            name: 'sven'
+        };
+        var func = function (a, b, c, d) {
+            alert(this.name); // 输出：sven
+            alert([a, b, c, d]) // 输出：[ 1, 2, 3, 4 ]
+        }.bind(obj, 1, 2);
+        func(3, 4);
+
+        //3. 借用其他对象的方法
+        var A = function (name) {
+            this.name = name;
+        };
+        var B = function () {
+            A.apply(this, arguments);
+        };
+        B.prototype.getName = function () {
+            return this.name;
+        };
+        var b = new B('sven');
+        console.log(b.getName()); // 输出： 'sven'
+
+
+        (function () {
+            Array.prototype.push.call(arguments, 3);
+            console.log(arguments); // 输出[1,2,3]
+        })(1, 2);
+
+        var a = {};
+        Array.prototype.push.call(a, 'first');
+        alert(a.length); // 输出：1
+        alert(a[0]); // first
+    </script>
+</body>
+
+</html>

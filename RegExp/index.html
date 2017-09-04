@@ -1,27 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <div id="div">
-        
+
     </div>
     <script>
         //匹配id,id中存在一种特殊的情况-字符\w是匹配不到的
         var idReg = /^#([\w-]+)$/
         var str = "#-"
-        console.log(idReg.test(str))  
+        console.log(idReg.test(str))
         //匹配类，类选择器的正则
         var classReg = /^\.([\w-]+)$/
         var str = ".-"
         console.log(classReg.test(str))
-        var testReg = /(^|\\s)abc(\s|$)/
-        var str = "sabc "
-        console.log(testReg.test(str))
+        //清除两边的空格
+        var trimReg = /^\s+|\s+$/g
+        console.log("d d d d".split(/\s+/g))
+        //将驼峰转换成-的形式 demoAbc找到oA,分组提取,转换成o-A,然后转换成小写
+        console.log("demoABC".replace(/([a-z])([A-Z])/, '$1-$2').toLowerCase())
+        //将字符串转成驼峰的格式,将匹配到的-a进行分组,拿到a转成大写A
+        console.log("demo-abc".replace(/-+(.)?/g, function (match, chr) {
+            return chr ? chr.toUpperCase() : ''
+        }))
+
+        // var testReg = /(^|\\s)abc(\s|$)/
+        // var str = "sabc "
+        // console.log(testReg.test(str))
     </script>
 </body>
+
 </html>
