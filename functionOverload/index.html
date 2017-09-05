@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //function.length与arguments.length的区别
+        //function.length拿到形参的个数
+        //arguments.length拿到实参的个数
+        function addMethod(obj, name, fn) {
+            //addMethod保存的fn永远存的是最后一次调用保存的fn
+            //old保存的是最后一次调用结果
+            var old = obj[name];
+            obj[name] = function () {
+                //如果是第一次的环境
+                //利用闭包存储回调的实参fn()
+                //比较回调的形参与实际调使用的实参
+                //实参与形参对应,就调用当前回调
+                if (fn.length == arguments.length) {
+                    //为什么要把回调函数用借调的方式来调用
+                    //因为要将this修正,指向当前对象,这样回调里就可以拿到userName
+                    //传入this,即使函数名改变,回调依旧指向当前环境,
+                    //将当前环境的实参传入回调
+                    return fn.apply(this, arguments);
+                } else if (typeof old == 'function') {
+                    return old.apply(this, arguments);
+                }
+            }
+        }
+        var person = {
+            userName: 'ghostwu'
+        };
+        addMethod(person, 'show', function () {
+            // alert(this.userName + '---->' + 'show1');
+        });
+        addMethod(person, 'show', function (str) {
+            // alert(this.userName + '---->' + str);
+        });
+        addMethod(person, 'show', function (a, b) {
+            // alert(this.userName + '---->' + (a + b));
+        });
+        person.show();
+        person.show(10);
+        // person.show(10, 20);
+    
+
+
+    </script>
+</body>
+
+</html>
